@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kona Passport</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Expanded:wght@600;700;800&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ==========================================================================
+     KONA PASSPORT — configuration lives in the CONFIG object in the script.
+     Colours and brands are edited there, not here.
+     ========================================================================== */
+
+  :root {
+    --bg:        #0A0E14;   /* deep instrument-panel navy-black */
+    --surface:   #121824;
+    --surface-2: #1A2234;
+    --line:      #26314A;
+    --ink:       #EAF0FA;
+    --ink-dim:   #8A97AE;
+    --accent:    #00E0C6;   /* Parcours-ish teal readout — swap in CONFIG-CSS below */
+    --accent-2:  #FFB020;   /* amber, for the "complete" state */
+    --danger:    #FF5C6C;
+    --radius:    14px;
+    --font-display: 'Archivo Expanded', 'Archivo', sans-serif;
+    --font-body: 'Archivo', sans-serif;
+    --font-mono: 'Spline Sans Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    min-height: 100%;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(0,224,198,0.10), transparent 60%),
+      radial-gradient(900px 500px at 100% 110%, rgba(255,176,32,0.06), transparent 55%),
+      var(--bg);
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 22px 20px 40px;
+    overflow-x: hidden;
+  }
+
+  /* ---- Header ---- */
+  .masthead { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+  .masthead .kicker {
+    font-family: var(--font-mono);
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent);
+  }
+  .masthead .loc {
+    font-family: var(--font-mono);
+    font-size: 11px; color: var(--ink-dim); letter-spacing: 0.1em;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(28px, 9vw, 40px);
+    line-height: 0.98;
+    letter-spacing: -0.01em;
+    margin: 10px 0 6px;
+    text-transform: uppercase;
+  }
+  h1 .thin { display:block; font-family: var(--font-body); font-weight:500; font-size: 14px; letter-spacing:0.16em; text-transform:uppercase; color: var(--ink-dim); margin-top: 8px; }
+
+  /* ---- Progress readout ---- */
+  .readout {
+    margin: 22px 0 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, var(--surface), var(--surface-2));
+    padding: 18px 18px 20px;
+  }
+  .readout-top { display:flex; align-items:center; justify-content:space-between; margin-bottom: 14px; }
+  .readout-label { font-family: var(--font-mono); font-size: 11px; letter-spacing:0.14em; text-transform:uppercase; color: var(--ink-dim); }
+  .counter { font-family: var(--font-display); font-weight: 800; font-size: 30px; letter-spacing: 0.02em; }
+  .counter .of { color: var(--ink-dim); font-size: 18px; }
+
+  .bar { height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; border:1px solid var(--line); }
+  .bar > i { display:block; height:100%; width:0%; background: linear-gradient(90deg, var(--accent), #6BFFEB); transition: width 600ms cubic-bezier(.2,.8,.2,1); }
+
+  /* ---- Booth grid ---- */
+  .grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 10px; margin-top: 16px; }
+  .booth {
+    display:flex; align-items:center; gap: 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: 14px 16px;
+    position: relative;
+    transition: border-color .3s, background .3s, transform .2s;
+  }
+  .booth .idx {
+    font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim);
+    width: 22px; flex: none;
+  }
+  .booth .name { font-weight: 600; font-size: 15px; letter-spacing: 0.01em; }
+  .booth .sub { font-size: 12px; color: var(--ink-dim); margin-top: 2px; font-family: var(--font-mono); }
+  .booth .stat {
+    margin-left: auto; flex: none;
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 1.5px solid var(--line);
+    display:grid; place-items:center;
+    color: var(--ink-dim); font-size: 13px;
+  }
+  .booth.done { border-color: rgba(0,224,198,0.5); background: linear-gradient(180deg, var(--surface), rgba(0,224,198,0.06)); }
+  .booth.done .stat { border-color: var(--accent); color: var(--accent); }
+  .booth.done .name { color: var(--ink); }
+  .booth.pending .name, .booth.pending .idx { opacity: 0.55; }
+
+  .booth.just-scanned { animation: pop .5s ease; }
+  @keyframes pop { 0%{transform:scale(1)} 30%{transform:scale(1.02)} 100%{transform:scale(1)} }
+
+  /* ---- Copy line ---- */
+  .hint { font-size: 13.5px; color: var(--ink-dim); line-height: 1.5; margin: 18px 2px 0; }
+  .hint b { color: var(--ink); font-weight: 600; }
+
+  /* ---- Unlock panel ---- */
+  .panel { display:none; margin-top: 22px; border:1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 20px; }
+  .panel.show { display:block; animation: rise .5s ease; }
+  @keyframes rise { from{opacity:0; transform: translateY(10px)} to{opacity:1; transform:none} }
+
+  .panel h2 { font-family: var(--font-display); font-weight:800; text-transform:uppercase; font-size: 20px; letter-spacing:-0.01em; }
+  .panel .lede { font-size: 13.5px; color: var(--ink-dim); margin: 8px 0 16px; line-height:1.5; }
+
+  label.field { display:block; font-family: var(--font-mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color: var(--ink-dim); margin-bottom: 8px; }
+  input[type=email] {
+    width:100%; background: var(--bg); border:1px solid var(--line); border-radius: 10px;
+    color: var(--ink); font-family: var(--font-body); font-size: 16px; padding: 13px 14px; outline:none;
+    transition: border-color .2s;
+  }
+  input[type=email]:focus { border-color: var(--accent); }
+
+  .consent { display:flex; gap:11px; align-items:flex-start; margin:16px 0 4px; cursor:pointer; }
+  .consent input { flex:none; width:20px; height:20px; margin-top:1px; accent-color: var(--accent); }
+  .consent span { font-size: 12.5px; color: var(--ink-dim); line-height:1.45; }
+
+  .btn {
+    width:100%; margin-top: 18px; border:none; border-radius: 11px; cursor:pointer;
+    background: var(--accent); color: #04120F;
+    font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+    font-size: 15px; padding: 15px; transition: opacity .2s, transform .1s;
+  }
+  .btn:active { transform: scale(.99); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .err { color: var(--danger); font-size:12.5px; margin-top:10px; min-height: 16px; font-family: var(--font-mono); }
+
+  /* ---- Offers ---- */
+  .offers { display:none; margin-top: 22px; }
+  .offers.show { display:block; animation: rise .5s ease; }
+  .offers h2 { font-family: var(--font-display); font-weight:800; text-transform:uppercase; font-size: 22px; letter-spacing:-0.01em; margin-bottom: 4px; }
+  .offers .lede { font-size:13.5px; color:var(--ink-dim); margin-bottom:16px; line-height:1.5; }
+  .offer {
+    border:1px solid var(--line); border-radius: var(--radius); background: var(--surface);
+    padding: 16px 18px; margin-bottom: 12px;
+  }
+  .offer .brand { font-family: var(--font-mono); font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color: var(--accent); margin-bottom:6px; }
+  .offer .headline { font-weight: 700; font-size: 16px; margin-bottom: 6px; }
+  .offer .desc { font-size:13.5px; color: var(--ink-dim); line-height:1.5; margin-bottom: 12px; }
+  .offer .code {
+    display:inline-block; font-family: var(--font-mono); font-size:14px; letter-spacing:0.08em;
+    background: var(--bg); border:1px dashed var(--line); border-radius:8px; padding:8px 12px; color: var(--ink);
+  }
+  .offer a.link { display:inline-block; margin-top: 4px; color: var(--accent); text-decoration:none; font-weight:600; font-size:14px; }
+
+  .footer { margin-top: 26px; text-align:center; font-family: var(--font-mono); font-size:10.5px; letter-spacing:0.1em; color: var(--ink-dim); text-transform:uppercase; }
+
+  .reset { margin-top:14px; text-align:center; }
+  .reset button { background:none; border:none; color: var(--ink-dim); font-family: var(--font-mono); font-size:11px; letter-spacing:0.08em; text-decoration:underline; cursor:pointer; }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+  <div class="masthead">
+    <span class="kicker" id="kicker">Passport</span>
+    <span class="loc">KONA · 2026</span>
+  </div>
+  <h1 id="title">Collect all five
+    <span class="thin">Scan each brand to unlock the vault</span>
+  </h1>
+
+  <div class="readout">
+    <div class="readout-top">
+      <span class="readout-label">Stamps collected</span>
+      <span class="counter"><span id="count">0</span><span class="of"> / 5</span></span>
+    </div>
+    <div class="bar"><i id="barfill"></i></div>
+  </div>
+
+  <div class="grid" id="grid"><!-- booths injected --></div>
+
+  <p class="hint" id="hint"></p>
+
+  <!-- Unlock gate -->
+  <div class="panel" id="panel">
+    <h2>Vault unlocked</h2>
+    <p class="lede">Five stamps, one reward. Drop your email to open the exclusive offers from all five brands and get a copy sent to you.</p>
+    <label class="field" for="email">Your email</label>
+    <input type="email" id="email" inputmode="email" autocomplete="email" placeholder="you@email.com">
+    <label class="consent">
+      <input type="checkbox" id="consent">
+      <span id="consentText"></span>
+    </label>
+    <button class="btn" id="unlockBtn" disabled>Unlock my offers</button>
+    <div class="err" id="err"></div>
+  </div>
+
+  <!-- Offers reveal -->
+  <div class="offers" id="offers">
+    <h2>Your Kona offers</h2>
+    <p class="lede">All five, in one place. We've also emailed you a copy.</p>
+    <div id="offerList"></div>
+  </div>
+
+  <div class="reset"><button id="resetBtn">Reset passport (testing only)</button></div>
+  <div class="footer">Faster Through Science</div>
+
+<script>
+/* ============================================================================
+   CONFIG — this is the only block you edit.
+   ============================================================================ */
+const CONFIG = {
+
+  // Storage key. Bump this (e.g. to _v2) if you ever want to force-clear
+  // everyone's saved progress after a change.
+  storageKey: 'kona_passport_v1',
+
+  // The five booths. Order here = booth number.
+  // booth=1 in the QR URL maps to booths[0], booth=2 -> booths[1], etc.
+  booths: [
+    { name: 'Parcours',            sub: 'Booth 01' },
+    { name: 'Brand Two',           sub: 'Booth 02' },
+    { name: 'Brand Three',         sub: 'Booth 03' },
+    { name: 'Brand Four',          sub: 'Booth 04' },
+    { name: 'Brand Five',          sub: 'Booth 05' },
+  ],
+
+  // Consent line — MUST name all five brands for valid GDPR consent.
+  consentText: 'Yes, sign me up for news and offers from all five partner brands: Parcours, Brand Two, Brand Three, Brand Four and Brand Five. Unsubscribe from any at any time.',
+
+  // The offers shown after unlock. One per brand (or fewer — any length works).
+  // Use EITHER `code` OR `link` (or both). Leave a field out to hide it.
+  offers: [
+    { brand: 'Parcours',    headline: 'Save on your next wheelset', desc: 'Exclusive Kona-only discount on any performance wheelset.', code: 'KONA-PARCOURS' },
+    { brand: 'Brand Two',   headline: 'Offer headline here',        desc: 'Short description of what they get.',                     code: 'CODE-TWO' },
+    { brand: 'Brand Three', headline: 'Offer headline here',        desc: 'Short description of what they get.',                     link: 'https://example.com/offer' },
+    { brand: 'Brand Four',  headline: 'Offer headline here',        desc: 'Short description of what they get.',                     code: 'CODE-FOUR' },
+    { brand: 'Brand Five',  headline: 'Offer headline here',        desc: 'Short description of what they get.',                     link: 'https://example.com/offer' },
+  ],
+
+  // Where to POST the email on unlock. This is your serverless endpoint
+  // (see brevo-endpoint.js). Leave as '' to run in LOCAL-ONLY test mode:
+  // the flow works and stores everything in the browser, but sends nothing.
+  submitEndpoint: '',
+};
+
+/* ============================================================================
+   LOGIC — you shouldn't need to touch anything below.
+   ============================================================================ */
+const $ = (id) => document.getElementById(id);
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(CONFIG.storageKey);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return { booths: {}, order: [], sid: newSid(), email: null, consent: false, unlocked: false };
+}
+function saveState(s) {
+  try { localStorage.setItem(CONFIG.storageKey, JSON.stringify(s)); } catch (e) {}
+}
+function newSid() {
+  return 'K' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+let state = loadState();
+
+// --- Read ?booth=N from the URL and record the scan ---
+function handleScanParam() {
+  const params = new URLSearchParams(window.location.search);
+  const b = parseInt(params.get('booth'), 10);
+  if (b >= 1 && b <= CONFIG.booths.length) {
+    if (!state.booths[b]) {
+      state.booths[b] = new Date().toISOString();
+      state.order.push(b);
+      saveState(state);
+      window._justScanned = b;
+    }
+    // Clean the URL so a refresh doesn't re-trigger and the param doesn't linger.
+    history.replaceState({}, '', window.location.pathname);
+  }
+}
+
+function collectedCount() { return Object.keys(state.booths).length; }
+
+// --- Render ---
+function renderBooths() {
+  const grid = $('grid');
+  grid.innerHTML = '';
+  CONFIG.booths.forEach((b, i) => {
+    const n = i + 1;
+    const done = !!state.booths[n];
+    const el = document.createElement('div');
+    el.className = 'booth ' + (done ? 'done' : 'pending') + (window._justScanned === n ? ' just-scanned' : '');
+    el.innerHTML =
+      '<span class="idx">' + String(n).padStart(2, '0') + '</span>' +
+      '<div><div class="name">' + b.name + '</div><div class="sub">' + (done ? 'Stamped' : b.sub) + '</div></div>' +
+      '<span class="stat">' + (done ? '&#10003;' : '&#9679;') + '</span>';
+    grid.appendChild(el);
+  });
+}
+
+function renderProgress() {
+  const c = collectedCount();
+  $('count').textContent = c;
+  $('barfill').style.width = (c / CONFIG.booths.length * 100) + '%';
+
+  const remaining = CONFIG.booths
+    .map((b, i) => ({ b, n: i + 1 }))
+    .filter(x => !state.booths[x.n])
+    .map(x => x.b.name);
+
+  const hint = $('hint');
+  if (c === 0) {
+    hint.innerHTML = 'Scan the QR code at any of the five brand booths to start collecting stamps.';
+  } else if (c < CONFIG.booths.length) {
+    const left = remaining.length === 1
+      ? 'One to go: <b>' + remaining[0] + '</b>.'
+      : remaining.length + ' to go: <b>' + remaining.join('</b>, <b>') + '</b>.';
+    hint.innerHTML = left + ' Find each booth and scan its code.';
+  } else {
+    hint.innerHTML = 'All five collected. Unlock your offers below.';
+  }
+}
+
+function renderGate() {
+  const complete = collectedCount() === CONFIG.booths.length;
+  $('consentText').textContent = CONFIG.consentText;
+
+  if (state.unlocked) {
+    $('panel').classList.remove('show');
+    renderOffers();
+    return;
+  }
+  $('panel').classList.toggle('show', complete);
+}
+
+function renderOffers() {
+  const list = $('offerList');
+  list.innerHTML = '';
+  CONFIG.offers.forEach(o => {
+    const el = document.createElement('div');
+    el.className = 'offer';
+    let inner = '<div class="brand">' + o.brand + '</div>' +
+                '<div class="headline">' + o.headline + '</div>' +
+                '<div class="desc">' + o.desc + '</div>';
+    if (o.code) inner += '<span class="code">' + o.code + '</span>';
+    if (o.link) inner += (o.code ? '<br>' : '') + '<a class="link" href="' + o.link + '" target="_blank" rel="noopener">Open offer &rarr;</a>';
+    el.innerHTML = inner;
+    list.appendChild(el);
+  });
+  $('offers').classList.add('show');
+}
+
+// --- Unlock submit ---
+function validEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+function refreshBtn() {
+  const ok = validEmail($('email').value.trim()) && $('consent').checked;
+  $('unlockBtn').disabled = !ok;
+}
+
+async function submitUnlock() {
+  const email = $('email').value.trim();
+  const consent = $('consent').checked;
+  const errEl = $('err');
+  errEl.textContent = '';
+
+  if (!validEmail(email)) { errEl.textContent = 'Enter a valid email.'; return; }
+  if (!consent) { errEl.textContent = 'Tick the consent box to continue.'; return; }
+
+  const btn = $('unlockBtn');
+  btn.disabled = true; btn.textContent = 'Unlocking…';
+
+  const payload = {
+    email: email,
+    consent: consent,
+    sessionId: state.sid,
+    scanOrder: state.order,
+    scanTimes: state.booths,
+    completedAt: new Date().toISOString(),
+  };
+
+  try {
+    if (CONFIG.submitEndpoint) {
+      const res = await fetch(CONFIG.submitEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('bad response');
+    } else {
+      // LOCAL-ONLY test mode — no endpoint set.
+      console.log('[Kona Passport] TEST MODE — would submit:', payload);
+      await new Promise(r => setTimeout(r, 500));
+    }
+
+    state.email = email; state.consent = consent; state.unlocked = true;
+    saveState(state);
+    $('panel').classList.remove('show');
+    renderOffers();
+    window.scrollTo({ top: document.getElementById('offers').offsetTop - 20, behavior: 'smooth' });
+
+  } catch (e) {
+    errEl.textContent = 'Something went wrong. Try again, or ask a brand rep for help.';
+    btn.disabled = false; btn.textContent = 'Unlock my offers';
+  }
+}
+
+// --- Wire up ---
+$('email').addEventListener('input', refreshBtn);
+$('consent').addEventListener('change', refreshBtn);
+$('unlockBtn').addEventListener('click', submitUnlock);
+$('resetBtn').addEventListener('click', () => {
+  localStorage.removeItem(CONFIG.storageKey);
+  window.location.href = window.location.pathname;
+});
+
+// --- Boot ---
+handleScanParam();
+renderBooths();
+renderProgress();
+renderGate();
+if (state.unlocked) renderOffers();
+</script>
+</body>
+</html>
