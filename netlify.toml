@@ -1,2 +1,10 @@
 [build]
   functions = "netlify/functions"
+
+# Answer the browser's CORS pre-flight at the edge, so the POST is allowed through.
+[[headers]]
+  for = "/.netlify/functions/unlock"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"
