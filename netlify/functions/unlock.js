@@ -1,22 +1,31 @@
-/* Kona Passport — Brevo handoff (Netlify Function)
-   Env vars required (set in Netlify dashboard, never in this file):
+/* Kona Passport — Brevo handoff (Netlify Function, modern runtime)
+   Env vars (Netlify dashboard → Environment variables):
      BREVO_API_KEY   — Brevo → SMTP & API → API Keys
-     BREVO_LIST_ID   — numeric ID of your Kona list in Brevo            */
+     BREVO_LIST_ID   — numeric ID of your Kona list                    */
 
-export async function handler(event) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  };
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers };
-  if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: 'Method not allowed' };
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export default async (req) => {
+  // Pre-flight
+  if (req.method === 'OPTIONS') {
+    return new Response('', { status: 204, headers: CORS });
+  }
+  if (req.method !== 'POST') {
+    return new Response('Method not allowed', { status: 405, headers: CORS });
+  }
 
   let data;
-  try { data = JSON.parse(event.body); } catch { return { statusCode: 400, headers, body: 'Bad JSON' }; }
+  try { data = await req.json(); }
+  catch { return new Response('Bad JSON', { status: 400, headers: CORS }); }
 
   const { email, consent, sessionId, scanOrder, completedAt } = data;
-  if (!email || !consent) return { statusCode: 400, headers, body: 'Email and consent required' };
+  if (!email || !consent) {
+    return new Response('Email and consent required', { status: 400, headers: CORS });
+  }
 
   try {
     const res = await fetch('https://api.brevo.com/v3/contacts', {
@@ -38,13 +47,20 @@ export async function handler(event) {
         },
       }),
     });
+
     if (res.status === 201 || res.status === 204) {
-      return { statusCode: 200, headers, body: JSON.stringify({ ok: true }) };
+      return new Response(JSON.stringify({ ok: true }), {
+        status: 200, headers: { ...CORS, 'Content-Type': 'application/json' },
+      });
     }
     console.error('Brevo error', res.status, await res.text());
-    return { statusCode: 502, headers, body: JSON.stringify({ ok: false }) };
+    return new Response(JSON.stringify({ ok: false }), {
+      status: 502, headers: { ...CORS, 'Content-Type': 'application/json' },
+    });
   } catch (e) {
     console.error(e);
-    return { statusCode: 500, headers, body: JSON.stringify({ ok: false }) };
+    return new Response(JSON.stringify({ ok: false }), {
+      status: 500, headers: { ...CORS, 'Content-Type': 'application/json' },
+    });
   }
-}
+};
