@@ -6,7 +6,7 @@
 <title>Kona Passport</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Expanded:wght@600;700;800&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   /* ==========================================================================
      KONA PASSPORT — configuration lives in the CONFIG object in the script.
@@ -14,19 +14,19 @@
      ========================================================================== */
 
   :root {
-    --bg:        #0A0E14;   /* deep instrument-panel navy-black */
-    --surface:   #121824;
-    --surface-2: #1A2234;
-    --line:      #26314A;
-    --ink:       #EAF0FA;
-    --ink-dim:   #8A97AE;
-    --accent:    #00E0C6;   /* Parcours-ish teal readout — swap in CONFIG-CSS below */
-    --accent-2:  #FFB020;   /* amber, for the "complete" state */
-    --danger:    #FF5C6C;
+    --bg:        #02192B;   /* Kona navy — from the shirt */
+    --surface:   #062338;
+    --surface-2: #0A2E48;
+    --line:      #16405E;
+    --ink:       #EAF2F9;
+    --ink-dim:   #7C95AB;
+    --accent:    #F2913D;   /* Kona sunset amber — the KONA wordmark colour */
+    --accent-2:  #FFC061;   /* lighter amber highlight */
+    --danger:    #FF6B6B;
     --radius:    14px;
-    --font-display: 'Archivo Expanded', 'Archivo', sans-serif;
-    --font-body: 'Archivo', sans-serif;
-    --font-mono: 'Spline Sans Mono', monospace;
+    --font-display: 'Roboto Mono', monospace;
+    --font-body: 'Roboto Mono', monospace;
+    --font-mono: 'Roboto Mono', monospace;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -41,8 +41,8 @@
 
   body {
     background:
-      radial-gradient(1200px 600px at 50% -10%, rgba(0,224,198,0.10), transparent 60%),
-      radial-gradient(900px 500px at 100% 110%, rgba(255,176,32,0.06), transparent 55%),
+      radial-gradient(1200px 600px at 50% -10%, rgba(242,145,61,0.12), transparent 60%),
+      radial-gradient(900px 500px at 100% 110%, rgba(255,192,97,0.07), transparent 55%),
       var(--bg);
     max-width: 480px;
     margin: 0 auto;
@@ -86,7 +86,7 @@
   .counter .of { color: var(--ink-dim); font-size: 18px; }
 
   .bar { height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; border:1px solid var(--line); }
-  .bar > i { display:block; height:100%; width:0%; background: linear-gradient(90deg, var(--accent), #6BFFEB); transition: width 600ms cubic-bezier(.2,.8,.2,1); }
+  .bar > i { display:block; height:100%; width:0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 600ms cubic-bezier(.2,.8,.2,1); }
 
   /* ---- Booth grid ---- */
   .grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 10px; margin-top: 16px; }
@@ -112,7 +112,7 @@
     display:grid; place-items:center;
     color: var(--ink-dim); font-size: 13px;
   }
-  .booth.done { border-color: rgba(0,224,198,0.5); background: linear-gradient(180deg, var(--surface), rgba(0,224,198,0.06)); }
+  .booth.done { border-color: rgba(242,145,61,0.5); background: linear-gradient(180deg, var(--surface), rgba(242,145,61,0.07)); }
   .booth.done .stat { border-color: var(--accent); color: var(--accent); }
   .booth.done .name { color: var(--ink); }
   .booth.pending .name, .booth.pending .idx { opacity: 0.55; }
@@ -147,7 +147,7 @@
   .btn {
     width:100%; margin-top: 18px; border:none; border-radius: 11px; cursor:pointer;
     background: var(--accent); color: #04120F;
-    font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+    font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
     font-size: 15px; padding: 15px; transition: opacity .2s, transform .1s;
   }
   .btn:active { transform: scale(.99); }
@@ -195,7 +195,7 @@
     <span class="loc">KONA · 2026</span>
   </div>
   <h1 id="title">Collect all five
-    <span class="thin">Scan each brand to unlock the vault</span>
+    <span class="thin">Scan the code from each brand to unlock your offers</span>
   </h1>
 
   <div class="readout">
@@ -212,7 +212,7 @@
 
   <!-- Unlock gate -->
   <div class="panel" id="panel">
-    <h2>Vault unlocked</h2>
+    <h2>Offers unlocked</h2>
     <p class="lede">Five stamps, one reward. Sign up below to open the exclusive offers from all five brands and get a copy sent to you.</p>
 
     <!-- ============================================================
@@ -223,7 +223,7 @@
          ============================================================ -->
     <div id="brevoForm">
       <!-- PASTE BREVO IFRAME EMBED CODE BELOW THIS LINE -->
-     <iframe width="540" height="305" src="https://ccc029a1.sibforms.com/v2/serve/MUIFAE3wN31AFPCSPDnimf4O1A5wN9SOkmoWPDLwS3pZ4U8U3ACBIwDOlIUAe1UOFtjfYKSxKk34WrzrBOHEMMd5PL5bKH0h2q8guD7ZG_bU_ma2ZTu1RmgOYt2lg1W8HFnSsbt1Sh6lQdAWQgBJ0IEsLPT7XnhsGmXHVlFGGAe3Qf2_2-tHXVl55NV4aE1vzNgWczDIATpbqvOBTw==" frameborder="0" scrolling="auto" allowfullscreen style="display: block;margin-left: auto;margin-right: auto;max-width: 100%;"></iframe>
+      <iframe width="540" height="305" src="https://ccc029a1.sibforms.com/v2/serve/MUIFAE3wN31AFPCSPDnimf4O1A5wN9SOkmoWPDLwS3pZ4U8U3ACBIwDOlIUAe1UOFtjfYKSxKk34WrzrBOHEMMd5PL5bKH0h2q8guD7ZG_bU_ma2ZTu1RmgOYt2lg1W8HFnSsbt1Sh6lQdAWQgBJ0IEsLPT7XnhsGmXHVlFGGAe3Qf2_2-tHXVl55NV4aE1vzNgWczDIATpbqvOBTw==" frameborder="0" scrolling="auto" allowfullscreen style="display: block;margin-left: auto;margin-right: auto;max-width: 100%;"></iframe>
       <!-- PASTE BREVO IFRAME EMBED CODE ABOVE THIS LINE -->
     </div>
 
@@ -255,24 +255,24 @@ const CONFIG = {
   // The five booths. Order here = booth number.
   // booth=1 in the QR URL maps to booths[0], booth=2 -> booths[1], etc.
   booths: [
-    { name: 'Parcours',            sub: 'Booth 01' },
-    { name: 'Brand Two',           sub: 'Booth 02' },
-    { name: 'Brand Three',         sub: 'Booth 03' },
-    { name: 'Brand Four',          sub: 'Booth 04' },
-    { name: 'Brand Five',          sub: 'Booth 05' },
+    { name: 'deboer',     sub: 'Booth 01' },
+    { name: 'Purpose',    sub: 'Booth 02' },
+    { name: 'Parcours',   sub: 'Booth 03' },
+    { name: 'truefuels',  sub: 'Booth 04' },
+    { name: 'EZGains',    sub: 'Booth 05' },
   ],
 
   // Consent line — MUST name all five brands for valid GDPR consent.
-  consentText: 'Yes, sign me up for news and offers from all five partner brands: Parcours, Brand Two, Brand Three, Brand Four and Brand Five. Unsubscribe from any at any time.',
+  consentText: 'Yes, sign me up for news and offers from all five partner brands: deboer, Purpose, Parcours, truefuels and EZGains. Unsubscribe from any at any time.',
 
   // The offers shown after unlock. One per brand (or fewer — any length works).
   // Use EITHER `code` OR `link` (or both). Leave a field out to hide it.
   offers: [
-    { brand: 'Parcours',    headline: 'Save on your next wheelset', desc: 'Exclusive Kona-only discount on any performance wheelset.', code: 'KONA-PARCOURS' },
-    { brand: 'Brand Two',   headline: 'Offer headline here',        desc: 'Short description of what they get.',                     code: 'CODE-TWO' },
-    { brand: 'Brand Three', headline: 'Offer headline here',        desc: 'Short description of what they get.',                     link: 'https://example.com/offer' },
-    { brand: 'Brand Four',  headline: 'Offer headline here',        desc: 'Short description of what they get.',                     code: 'CODE-FOUR' },
-    { brand: 'Brand Five',  headline: 'Offer headline here',        desc: 'Short description of what they get.',                     link: 'https://example.com/offer' },
+    { brand: 'deboer',     headline: 'Offer headline here', desc: 'Short description of what they get.', code: 'KONA-DEBOER' },
+    { brand: 'Purpose',    headline: 'Offer headline here', desc: 'Short description of what they get.', code: 'KONA-PURPOSE' },
+    { brand: 'Parcours',   headline: 'Save on your next wheelset', desc: 'Exclusive Kona-only discount on any performance wheelset.', code: 'KONA-PARCOURS' },
+    { brand: 'truefuels',  headline: 'Offer headline here', desc: 'Short description of what they get.', code: 'KONA-TRUEFUELS' },
+    { brand: 'EZGains',    headline: 'Offer headline here', desc: 'Short description of what they get.', code: 'KONA-EZGAINS' },
   ],
 
   // No backend in this version — signup is handled by the embedded Brevo form.
